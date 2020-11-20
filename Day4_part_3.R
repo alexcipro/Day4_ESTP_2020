@@ -21,6 +21,7 @@ devtools::install_github("jdemetra/rjdemetra")
 
 # To seasonally adjust a time series with a pre-defined specification you can either use the `x13()` function for the `X-13ARIMA` method or the `tramoseats()` function for the `TRAMO-SEATS` method.
 library(RJDemetra)
+head(ipi_c_eu)
 myseries <- ipi_c_eu[, "FR"]
 x13_model <- x13(myseries) # X-13ARIMA method
 ts_model <- tramoseats(myseries) # TRAMO-SEATS method
@@ -45,10 +46,17 @@ myseries <- ipi_c_eu[, "RO"]
 regarima_model <- regarima_x13(myseries, spec = "RG4c")
 regarima_model # Or summary(regarima_model) to have more details
 
+myseries
+class(myseries)
+head(myseries)
+
 
 ## RegARIMA examples
 
-layout(matrix(1:6, 3, 2));plot(regarima_model, ask = FALSE)
+layout(matrix(1:6, 3, 2));
+
+par(mfrow = c(3,2))
+plot(regarima_model, ask = FALSE)
 
 
 ## RegARIMA examples
@@ -99,6 +107,7 @@ x13_mod$final
 
 ## Seasonal adjustment examples - 6
 
+par(mfrow = c(1,1))
 plot(x13_mod$final, first_date = 2012, type_chart = "sa-trend")
 
 

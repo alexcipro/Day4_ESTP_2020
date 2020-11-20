@@ -10,9 +10,10 @@
 # * `data.table` is an `R` package that provides an enhanced version of 'data.frames'
 # * `data.table()` function creates data
 # * 'as.data.table()' convert existing objects
+library(data.table)
 DT <- data.table(ID = c("b","b","b","a","a","c"), a = 1:6, b = 7:12, c = 13:18)
 DT
-class(DT$ID)
+class(DT)
 # * columns of character type are never converted to factors by default
 # * when the number of rows to print exceeds the global option datatable.print.nrows (default = 100), it automatically prints only the top 5 and bottom 5 rows
 
@@ -35,6 +36,7 @@ dim(flights)
 ans <- flights[1:2]
 ans
 
+var1[, 1:2]
 
 ## Sort, Select
 
@@ -128,7 +130,7 @@ ans
 
 # So how can we directly order by all the grouping variables?
 ans <- flights[carrier == "AA",
-               .(mean(arr_delay), mean(dep_delay)),
+               .(mean_arr_delay=mean(arr_delay), mean_dep_delay=mean(dep_delay)),
                keyby = .(origin, dest, month)]
 ans
 
