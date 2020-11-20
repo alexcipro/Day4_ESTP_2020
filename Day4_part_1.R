@@ -81,7 +81,7 @@ slice(Cars93, c(1,4,10,15,n()))
 
 # * The function `filter()` can be selected rows that satisfy a condition:
 # * Example: all observations where variable _Manufacturer_ == is Audi and at the same time the value of variable _Min.Price_ > 25 is.
-filter(Cars93, Manufacturer=="Audi" & Min.Price > 25)
+filter(Cars93, Manufacturer == "Audi" & Min.Price > 25)
 # Note: the condition can be arbitrarily complex ( & , | )
 
 
@@ -102,6 +102,23 @@ head(arrange(Cars93, desc(MPG.city), Max.Price), 15)
 
 # Function `select()` allows you to select variables from the data
 head(select(Cars93, Manufacturer, Price), 3)
+
+head(Cars93[Cars93$Manufacturer == "Audi" & Cars93$Min.Price > 25, c("Manufacturer", "Price")], 3)
+
+Cars93 %>% 
+  filter(Manufacturer == "Audi" & Min.Price > 25) %>%
+  select(Manufacturer, Price) %>%
+  head(3)
+
+head(Cars93, filter(Manufacturer == "Audi" & Min.Price > 25))
+
+newvar <- Cars93 %>% 
+  filter(Manufacturer == "Audi" & Min.Price > 25) %>%
+  select(Manufacturer, Price) 
+
+
+Cars93[Cars93$Min.Price > 25, ]
+
 # Sequence of variables operator : selectable
 head(select(Cars93, Manufacturer:Price), 3)
 
@@ -139,7 +156,7 @@ head(select(Cars93, myPrize = Price, Min.Price))
 
 # * `rename()` returns all variables
 head(rename(Cars93, Manu2 = Manufacturer))
-
+# Cars93 <- rename(Cars93, Manu2 = Manufacturer)
 
 ## Uniqueness (1)
 
@@ -147,6 +164,13 @@ head(rename(Cars93, Manu2 = Manufacturer))
 Cars93_1 <- select(Cars93, Manufacturer, EngineSize)
 dim(Cars93_1)
 Cars93_1 <- distinct(Cars93_1); dim(Cars93_1)
+
+Cars93_1 <- Cars93 %>%
+  select(Manufacturer, EngineSize) %>%
+  distinct() %>%
+  arrange(Manufacturer, EngineSize)
+
+
 # By default, all variables are used to assess whether a _row multiple_ occurs in the data set
 
 
@@ -167,6 +191,8 @@ m[1:3, c(1,28)]
 # * `transmute()`: retains only the listed variables
 head(transmute(Cars93, is_manu = Manufacturer == "Ford", Manufacturer), 3)
 
+Cars93$is_manu <- ifelse(Cars93$Manufacturer == "Ford", TRUE, FALSE)
+
 
 ## Creating variables (2)
 
@@ -183,7 +209,14 @@ head(transmute(Cars93, Manufacturer,
 # + the minimum of the variables Prize
 # + the maximum of the variable Prize
 by_type <- group_by(Cars93, Type)
+class(by_type)
 summarize(by_type, count = n(), min_es = min(EngineSize), max_es = max(EngineSize))
+
+
+Cars93 %>%
+  group_by(Type) %>%
+  summarize(count = n(), min_es = min(EngineSize), max_es = max(EngineSize))
+
 
 
 ## Grouping and Aggregation (4)
@@ -212,14 +245,20 @@ Cars93 %>% group_by(Type) %>% slice(1:2)
 # + Compute new variable _EngineSize_ as the square of _EngineSize_
 # + Compute for each group the minimum of the new variable
 # + Sort the results in descending order accordingly to it
-Cars93 %>% mutate(ES2 = EngineSize^2) %>% group_by(Type) %>% 
-  summarize(min.ES2 = min(ES2)) %>% arrange(desc(min.ES2))
+Cars93 %>% 
+  mutate(ES2 = EngineSize^2) %>% 
+  group_by(Type) %>% 
+  summarize(min.ES2 = min(ES2)) %>% 
+  arrange(desc(min.ES2))
 
 
 ## Window Functions (2)
 
 # * Simple example: calculate cumulative sum and average value within each group
-Cars93 %>% group_by(Type) %>% arrange(Type) %>% 
-  select(Manufacturer:Price) %>% mutate(cmean = cummean(Price), 
-                                        csum = cumsum(Price))
+Cars93 %>% 
+  group_by(Type) %>% 
+  arrange(Type) %>% 
+  select(Manufacturer:Price) %>% 
+  mutate(cmean = cummean(Price), 
+         csum = cumsum(Price))
 
